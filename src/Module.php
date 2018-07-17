@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace BigChainDb;
+namespace KryuuCommon\BigChainDb;
 
 /**
  * Description of Module

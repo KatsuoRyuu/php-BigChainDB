@@ -9,8 +9,8 @@
 namespace KryuuCommon\BigChainDb\Driver;
 
 
-use KryuuCommon\Base58\Base58;
 use KryuuCommon\Buffer\Buffer;
+use KryuuCommon\BigChainDb\Entity\Transaction;
 /**
  * Description of Transaction
  *
@@ -41,27 +41,21 @@ class Transaction {
         ];
     }
 
+    /**
+     * 
+     * @return KryuuCommon\BigChainDb\Entity\Transaction
+     */
     public static function makeTransactionTemplate() {
-        $txTemplate = [
-            'id' => null,
-            'operation' => null,
-            'outputs' => [],
-            'inputs' => [],
-            'metadata' => null,
-            'asset' => null,
-            'version' => '2.0',
-        ];
-        return $txTemplate;
+        return new Transaction();
     }
 
     public static function makeTransaction($operation, $asset, $metadata = null, $outputs = [], $inputs = []) {
-        $tx = Transaction::makeTransactionTemplate();
-        $tx['operation'] = $operation;
-        $tx['asset'] = $asset;
-        $tx['metadata'] = $metadata;
-        $tx['inputs'] = $inputs;
-        $tx['outputs'] = $outputs;
-        return $tx;
+        return Transaction::makeTransactionTemplate()
+            ->setOperation($operation)
+            ->setAsset($asset)
+            ->setMetadata($metadata)
+            ->setInputs($inputs)
+            ->setOutputs($outputs);
     }
 
     /**
@@ -113,15 +107,18 @@ class Transaction {
         $buffer = new Buffer();
         $publicKeyBuffer = $buffer->from($publicKey, 'base58')->toString();
 
-        const ed25519Fulfillment = new cc.Ed25519Sha256()
-        ed25519Fulfillment.setPublicKey(publicKeyBuffer)
+        /**
+         * @todo Need to rebuild CryptoConditions for this;
+         */
+        //const ed25519Fulfillment = new cc.Ed25519Sha256()
+        //ed25519Fulfillment.setPublicKey(publicKeyBuffer)
 
-        if (json) {
-            return ccJsonify(ed25519Fulfillment)
+        if ($json) {
+            return ccJsonify($ed25519Fulfillment);
         }
 
-        return ed25519Fulfillment
-}
+        return $ed25519Fulfillment;
+    }
 
     /**
      * Create an Output from a Condition.
@@ -131,26 +128,29 @@ class Transaction {
      * @param {string} amount Amount of the output
      * @returns {Object} An Output usable in a Transaction
      */
-    static makeOutput(condition, amount = '1') {
-        if (typeof amount !== 'string') {
-            throw new TypeError('`amount` must be of type string')
+    public static function makeOutput($condition, $amount = '1') {
+        if ($amount !== 'string') {
+            throw new Exception('`amount` must be of type string');
         }
-        const publicKeys = []
-        const getPublicKeys = details => {
-            if (details.type === 'ed25519-sha-256') {
-                if (!publicKeys.includes(details.public_key)) {
-                    publicKeys.push(details.public_key)
+        $publicKeys = [];
+        $getPublicKeys = function($details) use ($publicKeys, $getPublicKeys) {
+            if ($details['type'] === 'ed25519-sha-256') {
+                if (!in_array($details['public_key'], $publicKeys)) {
+                    array_push($details['public_key'], $publicKeys);
                 }
-            } else if (details.type === 'threshold-sha-256') {
-                details.subconditions.map(getPublicKeys)
+            } else if ($details['type'] === 'threshold-sha-256') {
+                // details.subconditions.map(getPublicKeys);
+                foreach ($details['subconditions'] as $index => $var) {
+                    $details['subconditions'][$index] = $getPublicKeys($var);
+                }
             }
-        }
-        getPublicKeys(condition.details)
-        return {
-            condition,
-            'amount': amount,
-            'public_keys': publicKeys,
-        }
+        };
+        $getPublicKeys($condition['details']);
+        return [
+            $condition,
+            'amount' => $amount,
+            'public_keys' => $publicKeys,
+        ];
     }
 
     /**
@@ -159,14 +159,18 @@ class Transaction {
      * @param {boolean} [json=true] If true returns a json object otherwise a crypto-condition type
      * @returns {Object} Preimage-Sha256 Condition (that will need to wrapped in an Output)
      */
-    static makeSha256Condition(preimage, json = true) {
-        const sha256Fulfillment = new cc.PreimageSha256()
-        sha256Fulfillment.preimage = Buffer.from(preimage)
+    public static function makeSha256Condition($preimage, $json = true) {
+        /**
+         * @todo Need to rebuild CryptoConditions for this;
+         */
+        $sha256Fulfillment = new cc.PreimageSha256();
+        $buffer = new Buffer();
+        $sha256Fulfillment['preimage'] = $buffer->from($preimage);
 
-        if (json) {
-            return ccJsonify(sha256Fulfillment)
+        if ($json) {
+            return ccJsonify($sha256Fulfillment);
         }
-        return sha256Fulfillment
+        return $sha256Fulfillment;
     }
 
     /**
@@ -176,20 +180,19 @@ class Transaction {
      * @param {boolean} [json=true] If true returns a json object otherwise a crypto-condition type
      * @returns {Object} Sha256 Threshold Condition (that will need to wrapped in an Output)
      */
-    static makeThresholdCondition(threshold, subconditions = [], json = true) {
-        const thresholdCondition = new cc.ThresholdSha256()
-        thresholdCondition.threshold = threshold
+    public static function makeThresholdCondition($threshold, $subconditions = [], $json = true) {
+        $thresholdCondition = new cc.ThresholdSha256();
+        $thresholdCondition['threshold'] = $threshold;
 
-        subconditions.forEach((subcondition) => {
-            // TODO: add support for Condition and URIs
-            thresholdCondition.addSubfulfillment(subcondition)
-        })
-
-        if (json) {
-            return ccJsonify(thresholdCondition)
+        foreach ($subconditions as $subcondition) {
+            $thresholdCondition->addSubfulfillment($subcondition);
         }
 
-        return thresholdCondition
+        if ($json) {
+            return ccJsonify($thresholdCondition);
+        }
+
+        return $thresholdCondition;
     }
 
     /**
@@ -213,27 +216,27 @@ class Transaction {
      */
     // TODO:
     // - Make `metadata` optional argument
-    static makeTransferTransaction(
-        unspentOutputs,
-        outputs,
-        metadata
+    public static function makeTransferTransaction(
+        $unspentOutputs,
+        $outputs,
+        $metadata
     ) {
-        const inputs = unspentOutputs.map((unspentOutput) => {
-            const { tx, outputIndex } = { tx: unspentOutput.tx, outputIndex: unspentOutput.output_index }
-            const fulfilledOutput = tx.outputs[outputIndex]
-            const transactionLink = {
-                'output_index': outputIndex,
-                'transaction_id': tx.id,
-            }
+        $inputs = array_map( function($unspentOutput) use ($outputs) {
+            list($tx, $outputIndex) = [ $unspentOutput['tx'], $unspentOutput['output_index'] ];
+            $fulfilledOutput = $tx[$outputs['outputIndex']];
+            $transactionLink = [
+                'output_index' => $outputIndex,
+                'transaction_id' => $tx['id'],
+            ];
 
-            return Transaction.makeInputTemplate(fulfilledOutput.public_keys, transactionLink)
-        })
+            return Transaction::makeInputTemplate($fulfilledOutput['public_keys'], $transactionLink);
+        });
 
-        const assetLink = {
-            'id': unspentOutputs[0].tx.operation === 'CREATE' ? unspentOutputs[0].tx.id
-                : unspentOutputs[0].tx.asset.id
-        }
-        return Transaction.makeTransaction('TRANSFER', assetLink, metadata, outputs, inputs)
+        $assetLink = [
+            'id' => ($unspentOutputs[0]['tx']['operation'] === 'CREATE' ? $unspentOutputs[0]['tx']['id']
+                : $unspentOutputs[0]['tx']['asset']['id'])
+        ];
+        return Transaction::makeTransaction('TRANSFER', $assetLink, $metadata, $outputs, $inputs);
     }
 
     /**
@@ -247,29 +250,40 @@ class Transaction {
      *                                the `transaction`.
      * @returns {Object} The signed version of `transaction`.
      */
-    static signTransaction(transaction, ...privateKeys) {
-        const signedTx = clone(transaction)
-        const serializedTransaction =
-            Transaction.serializeTransactionIntoCanonicalString(transaction)
+    public static function signTransaction($transaction, $privateKeysArg) {
+        $signedTx = clone($transaction);
+        $privateKeys = func_get_args();
+        array_shift($privateKeys);
+        $serializedTransaction =
+            Transaction::serializeTransactionIntoCanonicalString($transaction);
+        
+        $buffer = new Buffer();
 
-        signedTx.inputs.forEach((input, index) => {
-            const privateKey = privateKeys[index]
-            const privateKeyBuffer = Buffer.from(base58.decode(privateKey))
+        foreach ($signedTx->getInputs() as $index => $input) {
+            $privateKey = $privateKeys[$index];
+            $privateKeyBuffer = $buffer->from($privateKey, 'base58')->get();
 
-            const transactionUniqueFulfillment = input.fulfills ? serializedTransaction
-                .concat(input.fulfills.transaction_id)
-                .concat(input.fulfills.output_index) : serializedTransaction
-            const transactionHash = sha256Hash(transactionUniqueFulfillment)
-            const ed25519Fulfillment = new cc.Ed25519Sha256()
-            ed25519Fulfillment.sign(Buffer.from(transactionHash, 'hex'), privateKeyBuffer)
-            const fulfillmentUri = ed25519Fulfillment.serializeUri()
+            $transactionUniqueFulfillment = $input['fulfills'] 
+                ? array_merge($serializedTransaction, 
+                    $input['fulfills']['transaction_id'],
+                    input['fulfills']['output_index'])
+                : $serializedTransaction;
+            $transactionHash = hash('sha256', $transactionUniqueFulfillment);        
+            
+            /**
+             * @todo Need to rebuild CryptoConditions for this;
+             */
+            $ed25519Fulfillment = new cc.Ed25519Sha256();
+            
+            $ed25519Fulfillment->sign($buffer->from($transactionHash, 'hex'), $privateKeyBuffer);
+            $fulfillmentUri = $ed25519Fulfillment->serializeUri();
 
-            input.fulfillment = fulfillmentUri
-        })
+            $input['fulfillment'] = $fulfillmentUri;
+        }
 
-        const serializedSignedTransaction =
-            Transaction.serializeTransactionIntoCanonicalString(signedTx)
-        signedTx.id = sha256Hash(serializedSignedTransaction)
-        return signedTx
+        $serializedSignedTransaction =
+            Transaction::serializeTransactionIntoCanonicalString($signedTx);
+        $signedTx['id'] = hash('sha256', $serializedSignedTransaction);
+        return $signedTx;
     }
 }

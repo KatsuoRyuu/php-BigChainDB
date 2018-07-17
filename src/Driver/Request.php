@@ -8,9 +8,6 @@
 
 namespace KryuuCommon\BigChainDb\Driver;
 
-use Zend\Http\Request;
-use KryuuCommon\Promise\Promise;
-
 class Request {
 
     const DEFAULT_REQUEST_CONFIG = [
@@ -50,18 +47,18 @@ class Request {
             $fetchConfig->body = json_encode($jsonBody);
         }
 
-        return fetch.fetch($expandedUrl, $fetchConfig)
-        .then(($res) => {
-// If status is not a 2xx (based on Response.ok), assume it's an error
-// See https://developer.mozilla.org/en-US/docs/Web/API/GlobalFetch/fetch
-            if (!($res && res . ok)) {
-                throw new \Exception(sprintf(
-                        'HTTP Error: Requested page not reachable; '
-                        . "Status: %s (%s); RequestUri: %s",
-                        $res->status, $res->statusText, $res->url));
-            }
-        return $res;
-        })
+//        return fetch.fetch($expandedUrl, $fetchConfig)
+//        .then(($res) => {
+//// If status is not a 2xx (based on Response.ok), assume it's an error
+//// See https://developer.mozilla.org/en-US/docs/Web/API/GlobalFetch/fetch
+//            if (!($res && res . ok)) {
+//                throw new \Exception(sprintf(
+//                        'HTTP Error: Requested page not reachable; '
+//                        . "Status: %s (%s); RequestUri: %s",
+//                        $res->status, $res->statusText, $res->url));
+//            }
+//        return $res;
+//        })
     }
 
     public function request($url, $config) {

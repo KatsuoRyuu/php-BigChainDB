@@ -2,13 +2,19 @@
 
 > This is a rewrite of the Big Chain DB - JS Driver, 
 > written in PHP, the functionality and interaction is almost if not the same as the JS Driver
-
-
+----
 > Main repo: https://git.ryuu.technology/KryuuCommon/BigChainDB
-
+----
 > unofficial PHP driver for [BigchainDB](https://github.com/bigchaindb/bigchaindb) to create transactions in PHP.
 
 [Driver API reference (in progress)](API.md)
+
+## Progress
+
+<i class="fas fa-puzzle-piece" aria-hidden="true"></i> test
+{: #puzzle-purple}
+
+  
 
 ## Compatibility
 
