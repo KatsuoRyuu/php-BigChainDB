@@ -94,7 +94,7 @@ $conn->postTransactionCommit($txSigned)
 
 * inspired by [`js-bigchaindb-quickstart`](https://github.com/sohkai/js-bigchaindb-quickstart) of @sohkhai [thanks]
 * re-written from [`js-bigchaindb-driver`](https://github.com/bigchaindb/js-bigchaindb-driver)
-* BigchainDB <dev@bigchaindb.com>
+* Anders Blenstrup-Pedersen @ [`katsuoryuu.org`](https://katsuoryuu.org/)
 
 ## License
 
