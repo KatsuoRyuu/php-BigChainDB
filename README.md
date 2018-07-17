@@ -22,7 +22,6 @@
 
   - [Installation and Usage](#installation-and-usage)
      - [Example: Create a transaction](#example-create-a-transaction)
-     - [Browser usage](#browser-usage)
   - [BigchainDB Documentation](#bigchaindb-documentation)
   - [Speed Optimizations](#speed-optimizations)
   - [Development](#development)
