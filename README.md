@@ -6,11 +6,11 @@
 
 > Main repo: https://git.ryuu.technology/KryuuCommon/BigChainDB
 
-# [![js-bigchaindb-driver](media/repo-banner@2x.png)](https://www.bigchaindb.com)
+# [![php-bigchaindb-driver](media/repo-banner@2x.png)](https://www.bigchaindb.com)
 
-> unofficial PHP driver for [BigchainDB](https://github.com/bigchaindb/bigchaindb) to create transactions in PHP and the browser.
+> unofficial PHP driver for [BigchainDB](https://github.com/bigchaindb/bigchaindb) to create transactions in PHP.
 
-- [Driver API reference](API.md)
+[Driver API reference (in progress)](API.md)
 
 ## Compatibility
 
