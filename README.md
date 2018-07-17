@@ -11,8 +11,22 @@
 
 ## Progress
 
-<i class="fas fa-puzzle-piece" aria-hidden="true"></i> test
-{: #puzzle-purple}
+
+| Part                     | status                                                        
+| ------------------------ | ---
+| Ed25519Keypair           | done (part of https://git.ryuu.technology/KryuuCommon/Buffer) 
+| baseRequest              | Started
+| Connection               | almost done
+| format_text              | done
+| index                    | Not needed
+| request                  | done
+| sanitize                 | Queued
+| sha256Hash               | done
+| stringify_as_query_param | Queued
+| transaction              | almost done
+| Utils/ccJsonLoad         | Queued
+| Utils/ccJsonify          | Queued
+
 
   
 
