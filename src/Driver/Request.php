@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -8,65 +8,37 @@
 
 namespace KryuuCommon\BigChainDb\Driver;
 
-class Request {
+use KryuuCommon\BigChainDb\Driver\BaseRequest;
 
-    const DEFAULT_REQUEST_CONFIG = [
-        'headers' => [
-            'Accept' => 'application/json'
-        ]
-    ];
+/**
+ * Description of Request
+ *
+ * @author spawn
+ */
+class Request extends BaseRequest {
+    //put your code here
+    public function request($url, $config = []) {
+    // Load default fetch configuration and remove any falsy query parameters
+    $requestConfig = Object.assign({}, DEFAULT_REQUEST_CONFIG, config, {
+        query: config.query && sanitize(config.query)
+    })
+    const apiUrl = url
 
-    public function baseRequest($url, $jsonBody, $query, $urlTemplateSpec, $fetchConfig) {
-        $expandedUrl = $url;
-
-        if ($urlTemplateSpec != null) {
-            if (is_array($urlTemplateSpec) && count($urlTemplateSpec)) {
-                // Use vsprintf for the array call signature
-                $expandedUrl = vsprintf($url, $urlTemplateSpec);
-            } else if ($urlTemplateSpec &&
-                is_array($urlTemplateSpec) &&
-                count($urlTemplateSpec)
-            ) {
-                $expandedUrl = format::filter($url, $urlTemplateSpec);
-            }
-        }
-
-        if ($query != null) {
-            if ($query === 'string') {
-                $expandedUrl .= $query;
-            } else if ($query && is_array($query)) {
-                $expandedUrl += stringifyAsQueryParam($query);
-            } 
-//            else if (process . env . NODE_ENV !== 'production') {
-//                // eslint-disable-next-line no-console
-//                console.warn('Supplied query was not a string or object. Ignoring...')
-//            }
-        }
-
-        if ($jsonBody != null) {
-            $fetchConfig->body = json_encode($jsonBody);
-        }
-
-//        return fetch.fetch($expandedUrl, $fetchConfig)
-//        .then(($res) => {
-//// If status is not a 2xx (based on Response.ok), assume it's an error
-//// See https://developer.mozilla.org/en-US/docs/Web/API/GlobalFetch/fetch
-//            if (!($res && res . ok)) {
-//                throw new \Exception(sprintf(
-//                        'HTTP Error: Requested page not reachable; '
-//                        . "Status: %s (%s); RequestUri: %s",
-//                        $res->status, $res->statusText, $res->url));
-//            }
-//        return $res;
-//        })
+    if (requestConfig.jsonBody) {
+        requestConfig.headers = Object.assign({}, requestConfig.headers, {
+            'Content-Type': 'application/json'
+        })
     }
 
-    public function request($url, $config) {
-        
+    if (!url) {
+        return Promise.reject(new Error('Request was not given a url.'))
     }
 
-    private function getRequestConfig($config) {
-        
-    }
-
+    return baseRequest(apiUrl, requestConfig)
+        .then(res => res.json())
+        .catch(err => {
+            console.error(err)
+            throw err
+        })
+}
 }
