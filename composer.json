@@ -7,7 +7,6 @@
         "kryuu-common/crypto-conditions": "dev-master"
     },
     "require-dev": {
-        "kryuu-common/base58": "dev-master",
         "phpunit/phpunit": "4.*"
     },
     "license": "MIT",
