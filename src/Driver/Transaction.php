@@ -9,8 +9,11 @@
 namespace KryuuCommon\BigChainDb\Driver;
 
 
-use KryuuCommon\Buffer\Buffer;
-use KryuuCommon\BigChainDb\Entity\Transaction;
+use KryuuCommon\Base58\Base58;
+use KryuuCommon\BigChainDB\Entity\Transaction;
+use KryuuCommon\BigChainDB\Exception\TypeException;
+use KryuuCommon\JsonStableStringify\Json;
+
 /**
  * Description of Transaction
  *
@@ -28,7 +31,8 @@ class Transaction {
         $tx = clone($transaction);
         // TODO: set fulfillments to null
         // Sort the keys
-        return $stableStringify($tx, function($a, $b) {
+        $stableJson = new Json();
+        return $stableJson->stringify($tx, function($a, $b) {
             return $a->key > $b->key ? 1 : -1;
         });
     }
@@ -42,8 +46,7 @@ class Transaction {
     }
 
     /**
-     * 
-     * @return KryuuCommon\BigChainDb\Entity\Transaction
+     * @return KryuuCommon\BigChainDB\Entity\Transaction
      */
     public static function makeTransactionTemplate() {
         return new Transaction();

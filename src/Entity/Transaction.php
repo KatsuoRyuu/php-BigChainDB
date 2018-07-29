@@ -5,8 +5,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+namespace KryuuCommon\BigChainDB\Entity;
 
-namespace KryuuCommon\BigChainDb\Entity;
+use KryuuCommon\BigChainDB\Entity\Asset;
+use KryuuCommon\BigChainDB\Entity\Input;
+use KryuuCommon\BigChainDB\Entity\Metadata;
+use KryuuCommon\BigChainDB\Entity\Output;
 
 /**
  * Description of Transaction
@@ -22,107 +26,42 @@ class Transaction {
     private $id = null;
     
     /**
-     *
-     * @var type 
+     * @var Asset
      */
-    private $operation = null;
+    private $asset = null;
     
     /**
-     *
-     * @var type 
+     * @var string
      */
-    private $outputs = [];
+    private $id = null;
     
     /**
-     *
-     * @var type 
+     * @var Input[]
      */
     private $inputs = [];
     
     /**
      *
-     * @var type 
+     * @var Metadata
      */
     private $metadata = null;
     
     /**
      *
-     * @var type 
+     * @var string 
      */
-    private $asset = null;
+    private $operation = null;
     
     /**
      *
-     * @var type 
+     * @var Output[]
+     */
+    private $outputs = [];
+    
+    /**
+     *
+     * @var string
      */
     private $version = '2.0';
-    
-    /**
-     *
-     * @var type 
-     */
-    
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-    
-    public function setOperation($operation) {
-        $this->operation = $operation;
-        return $this;
-    }
-    
-    public function setOutputs($outputs) {
-        $this->outputs = $outputs;
-        return $this;
-    }
-    
-    public function setInputs($inputs) {
-        $this->inputs = $inputs;
-        return $this;
-    }
-    
-    public function setMetadata($metadata) {
-        $this->metadata = $metadata;
-        return $this;
-    }
-    
-    public function setAsset($asset) {
-        $this->asset = $asset;
-        return $this;
-    }
-    
-    public function setVersion($version) {
-        $this->version = $version;
-        return $this;
-    }
-    
-    public function getId() {
-        return $this->id;
-    }
-    
-    public function getOperation() {
-        return $this->opertaion;
-    }
-    
-    public function getOutputs() {
-        return $this->outputs;
-    }
-    
-    public function getInputs() {
-        return $this->inputs;
-    }
-    
-    public function getMetadata() {
-        return $this->metadata;
-    }
-    
-    public function getAsset() {
-        return $this->asset;
-    }
-    
-    public function getVersion() {
-        return $this->version;
-    }
-    
+
 }
