@@ -1,0 +1,56 @@
+image: registry.git.ryuu.technology/docker/gitlabrunners/phpcomposer:latest
+
+services:
+  - docker:dind
+
+stages:
+- build
+- test
+
+variables:
+#    CONTAINER_IMAGE: $CI_REGISTRY/docker/gitlabrunners/phpcomposer
+#    CONTAINER_IMAGE: registry.git.ryuu.technology/$CI_PROJECT_PATH
+    VERSION_MAJOR: 0
+    VERSION_MINOR: 0
+    VERSION_PATCH: 0
+    DOMAIN: git.ryuu.technology
+    
+
+before_script:
+- export VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}+${CI_PIPELINE_ID}"
+- export CI_PROJECT_SSH_URL=git@${DOMAIN}:${CI_PROJECT_PATH}
+- 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+- eval $(ssh-agent -s)
+- mkdir -p ~/.ssh
+- ssh-keyscan -p 2200 -t rsa ${DOMAIN} >> ~/.ssh/known_hosts
+- echo -e "Host ${DOMAIN}\n    HostName ${DOMAIN}\n    Port 2200\n    User git\n    IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
+- echo -e "$AUTO_TAGGING_KEY" >> ~/.ssh/id_rsa
+- chmod 700 -R ~/.ssh
+- git remote set-url --push origin ${CI_PROJECT_SSH_URL}
+- git config user.email "${GITLAB_USER_EMAIL}"
+- git config user.name "${GITLAB_USER_LOGIN}"
+
+after_script:
+- rm -Rf ~/.ssh
+
+build:
+    stage: build
+    only:
+    - master
+    artifacts:
+        paths:
+        - ./vendor/
+    script:
+    - composer install -n --no-progress --apcu-autoloader
+    
+test:
+    stage: test
+    only:
+    - master
+    artifacts:
+        paths:
+        - ./vendor/
+    script:
+    - ./vendor/bin/phpunit --coverage-text --colors=never
+    - git tag -a "v${VERSION}" -m "CI Auto Tagging"
+    - git push origin v${VERSION}
