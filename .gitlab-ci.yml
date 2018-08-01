@@ -1,0 +1,153 @@
+image: registry.git.ryuu.technology/docker/gitlabdockerrunner:latest
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    TESTING_STAGE: testing
+    STAGING_STAGE: staging
+    DEVELOP_STAGE: develop
+    
+    TESTING_FLOW_CONTAINER:     ${TESTING_STAGE}-flow-backend
+    TESTING_MYSQL_CONTAINER:    ${TESTING_STAGE}-flow-mysql
+    
+    STAGING_FLOW_CONTAINER:     ${STAGING_STAGE}-flow-backend
+    STAGING_MYSQL_CONTAINER:    ${STAGING_STAGE}-flow-mysql
+    
+    DEVELOP_FLOW_CONTAINER:     ${DEVELOP_STAGE}-flow-backend
+    DEVELOP_MYSQL_CONTAINER:    ${DEVELOP_STAGE}-flow-mysql
+    DEVELOP_FLOW_IMAGE:         ${DEVELOP_STAGE}-flow-backend
+    DEVELOP_NETWORK:             ${DEVELOP_STAGE}-network-flow-backend
+    DEVELOP_USERNAME:           develop-flow
+    DEVELOP_PASSWORD:           Zsw3VWxnKUuTp
+    
+
+stages:
+- Build
+- Run Container
+- Install Composer Components
+- Code Sniffer
+- Unit Test
+- Push to Registry
+- Deploy development
+
+before_script:
+- echo $CI_REGISTRY
+- echo $CI_REGISTRY_IMAGE
+- echo "STARTING";
+- echo "RUNNER ${CI_RUNNER_ID}";
+- docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+- cp gitlab-ci.env .env
+- MYSQL_PASSWORD=`date +%s | sha256sum | base64 | head -c 13 ; echo`
+- echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+- echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
+- echo "STAGE=${TESTING_STAGE}_" >> .env
+- echo "BUILDVERSION=${CI_COMMIT_SHA}" >> .env
+- echo "FLOW_CONTAINER=${TESTING_FLOW_CONTAINER}" >> .env
+- echo "MYSQL_CONTAINER=${TESTING_MYSQL_CONTAINER}" >> .env
+- cat .env
+
+
+build:
+    stage: Build
+    only: 
+    - master
+    script:
+    - ls -lah
+    - docker-compose pull
+    - docker-compose -p tmp-${TESTING_STAGE} build
+    
+run-container:
+    stage: Run Container
+    only: 
+    - master
+    dependencies:
+    - build
+    script:
+    - docker-compose -p tmp-${TESTING_STAGE} up -d
+    
+install-composer-components:
+    stage: Install Composer Components
+    only: 
+    - master
+    dependencies:
+    - run-container
+    retry: 2
+    script:
+    - docker exec ${TESTING_FLOW_CONTAINER} ls -lah /opt/flow-systems
+    - docker exec ${TESTING_FLOW_CONTAINER} /opt/composer/composer.phar --working-dir=/opt/flow-systems/ install
+  
+unit-test:
+    stage: Unit Test
+    only: 
+    - master
+    dependencies:
+    - build
+    - run-container
+    script:
+    - docker exec ${TESTING_FLOW_CONTAINER} /opt/composer/composer.phar --working-dir=/opt/flow-systems/ ci-test
+
+code-sniffer:
+    stage: Code Sniffer
+    only: 
+    - master
+    dependencies:
+    - build
+    - run-container
+    script:
+    - docker exec ${TESTING_FLOW_CONTAINER} /opt/composer/composer.phar --working-dir=/opt/flow-systems/ ci-cs-check 
+
+registry-push:
+    stage: Push to Registry
+    only: 
+    - master
+    dependencies:
+    - build
+    - run-container
+    - code-sniffer
+    - unit-test
+    script:
+    - docker exec ${TESTING_FLOW_CONTAINER} /opt/composer/composer.phar --working-dir=/opt/flow-systems/ install --no-ansi --no-dev --no-interaction --no-progress --no-scripts --optimize-autoloader
+    - ls -lah
+    - cd FlowBackend;
+    - ls -lah
+    - docker tag tmp-${TESTING_STAGE}_flow-backend $CI_REGISTRY_IMAGE:develop
+    - docker tag tmp-${TESTING_STAGE}_flow-backend $CI_REGISTRY_IMAGE:$CI_BUILD_REF
+    - docker push $CI_REGISTRY_IMAGE:$CI_BUILD_REF
+    - docker push $CI_REGISTRY_IMAGE:develop
+    
+deploy-develop:
+    stage: Deploy development
+    environment:
+        name: Develop
+        url: https://flow.development.ryuu.technology
+    only: 
+    - master
+    when: manual
+    dependencies:
+    - build
+    - run-container
+    - code-sniffer
+    - unit-test
+    before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - cp gitlab-ci.env .env
+    - MYSQL_PASSWORD=`date +%s | sha256sum | base64 | head -c 20 ; echo`
+    - echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+    - echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
+    - echo "STAGE=${STAGING_STAGE}_" >> .env
+    - echo "BUILDVERSION=${CI_COMMIT_SHA}" >> .env
+    - echo "FLOW_CONTAINER=${DEVELOP_FLOW_CONTAINER}" >> .env
+    - echo "MYSQL_CONTAINER=${DEVELOP_MYSQL_CONTAINER}" >> .env
+    - echo "CI_IMAGE=${CI_REGISTRY_IMAGE}:develop" >> .env
+    - echo "DOCKER_NETWORK=${DEVELOP_NETWORK}" >> .env
+    - cat .env 
+    script:
+    - docker pull $CI_REGISTRY_IMAGE:develop
+    - docker-compose -p tmp-${DEVELOP_STAGE} -f docker-compose.production.yml up -d
+    - docker exec ${DEVELOP_FLOW_CONTAINER} htpasswd -b -c /opt/flow-systems/.htpasswd ${DEVELOP_USERNAME} ${DEVELOP_PASSWORD}
+    - docker cp ${DEVELOP_FLOW_CONTAINER}:/opt/flow-systems/public/.htaccess /tmp/.htaccess
+    - echo 'AuthType Basic' >> /tmp/.htaccess
+    - echo 'AuthName "Authentication Required"' >> /tmp/.htaccess
+    - echo 'AuthUserFile /opt/flow-systems/.htpasswd' >> /tmp/.htaccess
+    - echo 'Require valid-user' >> /tmp/.htaccess
+    - docker cp /tmp/.htaccess ${DEVELOP_FLOW_CONTAINER}:/opt/flow-systems/public/.htaccess
+    - docker exec ${DEVELOP_FLOW_CONTAINER} chown www-data:www-data /opt/flow-systems/public/.htaccess

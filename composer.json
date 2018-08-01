@@ -1,8 +1,10 @@
 {
     "name": "kryuu-common/big-chain-db-driver",
     "description": "Base58 Encoding and Decoding Library for PHP",
+    "repositories": [ 
+        { "type": "composer", "url": "https://composer.git.ryuu.technology/packages/php/" }
+    ],
     "require": {
-        "kryuu-common/base58": "dev-master",
         "kryuu-common/buffer": "dev-master",
         "kryuu-common/crypto-conditions": "dev-master"
     },
