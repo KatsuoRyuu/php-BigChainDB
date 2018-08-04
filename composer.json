@@ -8,7 +8,8 @@
     "prefer-stable": true,
     "require": {
         "kryuu-common/buffer": "dev-master",
-        "kryuu-common/crypto-conditions": "dev-master"
+        "kryuu-common/crypto-conditions": "dev-master",
+        "kryuu-common/json-stable-stringify": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*"
@@ -21,7 +22,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "KryuuCommon\\BigChainDbTest\\":             "test/"
+            "KryuuCommon\\BigChainDbTest\\": "test/"
         }
     }
 }

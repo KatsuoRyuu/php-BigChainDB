@@ -13,6 +13,7 @@ use KryuuCommon\Base58\Base58;
 use KryuuCommon\BigChainDb\Entity;
 use KryuuCommon\BigChainDb\Exception\TypeException;
 use KryuuCommon\JsonStableStringify\Json;
+use KryuuCommon\Buffer\Buffer;
 
 /**
  * Description of Transaction
@@ -20,6 +21,9 @@ use KryuuCommon\JsonStableStringify\Json;
  * @author spawn
  */
 class Transaction {
+    
+    private $jsonifier = null;
+    
     /**
      * Canonically serializes a transaction into a string by sorting the keys
      * @param {Object} (transaction)
@@ -117,7 +121,8 @@ class Transaction {
         //ed25519Fulfillment.setPublicKey(publicKeyBuffer)
 
         if ($json) {
-            return ccJsonify($ed25519Fulfillment);
+            
+            return (new Json())->stringify($ed25519Fulfillment);
         }
 
         return $ed25519Fulfillment;
@@ -288,5 +293,13 @@ class Transaction {
             Transaction::serializeTransactionIntoCanonicalString($signedTx);
         $signedTx['id'] = hash('sha256', $serializedSignedTransaction);
         return $signedTx;
+    }
+    
+    public function getJson() {
+        if (!$this->jsonifier) {
+            $this->jsonifier = new Json();
+        }
+        
+        return $this->jsonifier;
     }
 }

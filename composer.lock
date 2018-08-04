@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "949006776f190f676ea57f30236bbea5",
+    "content-hash": "bae7bcda88c3778b547809252487e2e3",
     "packages": [
         {
             "name": "kryuu-common/base58",
@@ -35,7 +35,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.ryuu.technology/KryuuCommon/Buffer",
-                "reference": "74a39151fe58ac0d62f92ecfa495c431cac38a0e"
+                "reference": "6d0178a5c25bda5d743aaff7e3ffe4426f9d3c1d"
             },
             "require": {
                 "kryuu-common/base58": "dev-master"
@@ -53,7 +53,7 @@
                 "MIT"
             ],
             "description": "Buffer controller for multiple types of conversions like Base64 and Base58",
-            "time": "2018-08-04T07:56:31+00:00"
+            "time": "2018-08-04T12:00:35+00:00"
         },
         {
             "name": "kryuu-common/crypto-conditions",
@@ -77,6 +77,29 @@
             ],
             "description": "Base58 Encoding and Decoding Library for PHP",
             "time": "2018-08-01T13:57:11+00:00"
+        },
+        {
+            "name": "kryuu-common/json-stable-stringify",
+            "version": "master",
+            "source": {
+                "type": "git",
+                "url": "https://git.ryuu.technology/KryuuCommon/JsonStableStringify",
+                "reference": "d98579a2cd30377d9afd78828a9b55fb1f74295e"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KryuuCommon\\JsonStableStringify\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "deterministic version of json->stringify() so you can get a consistent hash from stringified results",
+            "time": "2018-08-04T12:12:52+00:00"
         }
     ],
     "packages-dev": [
@@ -1266,7 +1289,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "kryuu-common/buffer": 20,
-        "kryuu-common/crypto-conditions": 20
+        "kryuu-common/crypto-conditions": 20,
+        "kryuu-common/json-stable-stringify": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

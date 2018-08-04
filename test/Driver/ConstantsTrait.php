@@ -28,7 +28,7 @@ Trait ConstantsTrait {
     }
     
     private function aliceCondition() {
-        return Transaction::makeEd25519Condition($this->alice()->publicKey);
+        return Transaction::makeEd25519Condition($this->alice()->getPublic());
     }
     
     private function aliceOutput() {
