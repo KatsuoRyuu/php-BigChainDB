@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace KryuuCommon\BigChainDB\Entity;
+namespace KryuuCommon\BigChainDb\Entity;
 
 /**
  * Description of Metadata

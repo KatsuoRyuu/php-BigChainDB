@@ -5,12 +5,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace KryuuCommon\BigChainDB\Entity;
+namespace KryuuCommon\BigChainDb\Entity;
 
-use KryuuCommon\BigChainDB\Entity\Asset;
-use KryuuCommon\BigChainDB\Entity\Input;
-use KryuuCommon\BigChainDB\Entity\Metadata;
-use KryuuCommon\BigChainDB\Entity\Output;
+use KryuuCommon\BigChainDb\Entity\Asset;
+use KryuuCommon\BigChainDb\Entity\Input;
+use KryuuCommon\BigChainDb\Entity\Metadata;
+use KryuuCommon\BigChainDb\Entity\Output;
 
 /**
  * Description of Transaction

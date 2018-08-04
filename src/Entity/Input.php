@@ -6,9 +6,9 @@
  * and open the template in the editor.
  */
 
-namespace KryuuCommon\BigChainDB\Entity;
+namespace KryuuCommon\BigChainDb\Entity;
 
-use KryuuCommon\BigChainDB\Entity\Fulfill;
+use KryuuCommon\BigChainDb\Entity\Fulfill;
 /**
  * Description of Input
  *

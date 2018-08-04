@@ -4,9 +4,11 @@
     "repositories": [ 
         { "type": "composer", "url": "https://composer.git.ryuu.technology/packages/php/" }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "kryuu-common/buffer": "master",
-        "kryuu-common/crypto-conditions": "master"
+        "kryuu-common/buffer": "dev-master",
+        "kryuu-common/crypto-conditions": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*"
@@ -15,6 +17,11 @@
     "autoload": {
         "psr-4": {
             "KryuuCommon\\BigChainDb\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KryuuCommon\\BigChainDbTest\\":             "test/"
         }
     }
 }

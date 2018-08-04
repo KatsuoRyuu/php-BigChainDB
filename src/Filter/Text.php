@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace KryuuCommon\BigChainDB\Filter;
+namespace KryuuCommon\BigChainDb\Filter;
 
 class Text {
     

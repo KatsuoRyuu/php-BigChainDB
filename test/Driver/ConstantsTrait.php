@@ -6,8 +6,10 @@
  * and open the template in the editor.
  */
 
-namespace KryuuCommon\BigChainDBTest\Driver;
+namespace KryuuCommon\BigChainDbTest\Driver;
 
+use KryuuCommon\BigChainDb\Driver\Transaction;
+use KryuuCommon\Buffer\Buffer;
 /**
  * Description of ConstantsTrait
  *
@@ -22,7 +24,7 @@ Trait ConstantsTrait {
     private $metaData = [ 'message' => 'metaDataMessage' ];
 
     private function alice() {
-        return new Ed25519Keypair();
+        return (new Buffer())->toKeypair();
     }
     
     private function aliceCondition() {

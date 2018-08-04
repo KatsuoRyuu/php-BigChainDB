@@ -6,9 +6,9 @@
  * and open the template in the editor.
  */
 
-namespace KryuuCommon\BigChainDB\Entity;
+namespace KryuuCommon\BigChainDb\Entity;
 
-use KryuuCommon\BigChainDB\Entity\ConditionDetails;
+use KryuuCommon\BigChainDb\Entity\ConditionDetails;
 
 /**
  * Description of Condition

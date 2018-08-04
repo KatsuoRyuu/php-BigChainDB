@@ -5,16 +5,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace KryuuCommon\BigChainDBTest\Driver;
+namespace KryuuCommon\BigChainDbTest\Driver;
 
-use KryuuCommon\BigChainDB\Driver\Transaction;
+use KryuuCommon\BigChainDb\Driver\Transaction;
+use KryuuCommon\BigChainDbTest\Driver\ConstantsTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Description of TransactionTest
  *
  * @author spawn
  */
-class TransactionTest {
+class TransactionTest extends TestCase {
     
     use ConstantsTrait;
     

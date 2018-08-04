@@ -10,8 +10,8 @@ namespace KryuuCommon\BigChainDb\Driver;
 
 
 use KryuuCommon\Base58\Base58;
-use KryuuCommon\BigChainDB\Entity\Transaction;
-use KryuuCommon\BigChainDB\Exception\TypeException;
+use KryuuCommon\BigChainDb\Entity;
+use KryuuCommon\BigChainDb\Exception\TypeException;
 use KryuuCommon\JsonStableStringify\Json;
 
 /**
@@ -46,10 +46,10 @@ class Transaction {
     }
 
     /**
-     * @return KryuuCommon\BigChainDB\Entity\Transaction
+     * @return KryuuCommon\BigChainDb\Entity\Transaction
      */
     public static function makeTransactionTemplate() {
-        return new Transaction();
+        return new Entity\Transaction();
     }
 
     public static function makeTransaction($operation, $asset, $metadata = null, $outputs = [], $inputs = []) {
